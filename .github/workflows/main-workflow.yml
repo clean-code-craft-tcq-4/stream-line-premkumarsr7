@@ -31,7 +31,7 @@ jobs:
     - name: Build and main class
       run: mvn -f ./pom.xml compile exec:java -Dexec.mainClass="com.tdd.sender.Sender"
     - name: Build Receiver
-      run: g++ -Wall -Wextra -fprofile-arcs -ftest-coverage -o streamline *.cpp* ./src/receiver/*.cpp* ./src/test/*.cpp*
+      run: g++ -Wall -Wextra -fprofile-arcs -ftest-coverage -o streamline ./src/receiver/*.cpp* ./src/test/*.cpp*
     - name: run
       run: ./streamline
 
