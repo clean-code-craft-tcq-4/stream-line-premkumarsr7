@@ -1,0 +1,46 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Build Run and Test
+
+on:
+  push:
+    paths-ignore:
+    - '**.md'
+  pull_request:
+    paths-ignore:
+    - '**.md'
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcovr
+
+    - name: Build and Test
+      run: mvn -f pom.xml test
+    - name: Build and main class
+      run: mvn -f ./pom.xml compile exec:java -Dexec.mainClass="com.tdd.sender.Sender"
+    - name: Build Receiver
+      run: g++ -Wall -Wextra -fprofile-arcs -ftest-coverage -o streamline ./src/receiver/*.cpp* ./src/test/*.cpp*
+    - name: run
+      run: python src/test/socandteststreams.py | ./streamline
+
+    - name: collect coverage
+      run: gcovr --gcov-exclude=".*test.*" -r . --html --html-details -o coverage.html --print-summary
+
+    - name: create coverage artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: ./*.html
+        retention-days: 21
