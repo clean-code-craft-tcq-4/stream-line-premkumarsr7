@@ -34,3 +34,13 @@ jobs:
       run: g++ -Wall -Wextra -fprofile-arcs -ftest-coverage -o streamline *.cpp* ./src/receiver/*.cpp* ./src/test/*.cpp*
     - name: run
       run: ./streamline
+
+    - name: collect coverage
+      run: gcovr --gcov-exclude=".*test.*" -r . --html --html-details -o coverage.html --print-summary
+
+    - name: create coverage artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: ./*.html
+        retention-days: 21
